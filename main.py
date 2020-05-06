@@ -1,7 +1,7 @@
 import numpy as np
 from NeuralNetwork import *
     
-def run():
+def runPreceptron():
     p = Preceptron(2)
     width = 600
     height = 400
@@ -29,10 +29,17 @@ def run():
             e +=1 
     print('final error : ',e/test)
     
-    
-    
+ 
+def runMultiPreceptron():
+    MP = MultiPreceptron(3,4)
+    MP.set_input([[2,2,2],[3,3,3],[4,4,4]])
+    o = MP.get_output()
+    print(o)
+            
+            
 if __name__ == '__main__':
-    run()
+    runMultiPreceptron()
+    
             
     
 #end

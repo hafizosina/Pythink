@@ -29,44 +29,71 @@ class Preceptron:
             self.weight = [self.weight[i]+dW[i] for i in range(len(self.weight))]
         elif self.e < t:
             pass
+
+class MultiPreceptron:
+    def __init__(self,i, o):
         
+        self.input = []
+        self.learnigRate = 0.1
+        self.weight = [[np.random.random() for i in range(i+1)] for j in range(o)]
+        # self.weight= [
+                      # [3,3,3,1],
+                      # [4,4,4,1],
+                      # [5,5,5,1],
+                      # [6,6,6,1]
+                      # ]
+        self.weightT = np.transpose(self.weight)
+        
+    def set_learnigRate(self, x):
+        self.learnigRate = x
+        
+    def set_input(self, i = []):
+        '''
+         format input in this module is following format on sentdex youtube tutorial
+            checkout https://youtube.com/sentdex
             
+            if just one input so
+                
+                MP = MultiPreceptron(4, 3)
+                
+                x =[x1, x2, x3, x4]
+                MP.set_input(x)
+                
+            if you sending bacth of input so
+                exmaple with 3 batch
+                
+                MP = MultiPreceptron(4, 3)
+                
+                x1 = [x11, x12, x13, x14] 
+                x2 = [x21, x22, x23, x24] 
+                x3 = [x31, x32, x33, x34] 
+                x = [xx1, x2, x3]
+                MP.set_input(x)
+        '''
+        
+        if len(np.shape(i)) == 2:
+            if len(i[0]) == len(self.weight[0])-1:
+                self.input = i
+                for i, _ in enumerate(self.input):
+                    self.input[i].append(1)
+            else:
+                print('Jumlah input tidak cocok !')
+        if np.shape(i) == 1:
+            if len(i) == len(self.weight[0])-1:
+                self.input = i
+                self.input.append(1)
+            else:
+                print('Jumlah input tidak cocok !')
+    def get_output(self):
+        self.output = np.dot(self.input, self.weightT)
+        self.output = sigmoid_func(self.output)
+        return self.output
+        
+    def learn(self, y, t): #y gonna be the true answer and tis minimun tolerance 
+        self.error = np.min(self.output,y)
+        
 def sigmoid_func(x):
     return 1/(1+np.power(np.e, -x))
-    
-    
-def run():
-    p = Preceptron(2)
-    width = 600
-    height = 400
-    x1 = [[np.random.randint(0,width),np.random.randint(0,height)] for i in range(100)]
-    for i in range(len(x1)):
-        p.set_input(x1[i])
-        y = p.get_output()
-        if x1[i][0]<x1[i][1]:
-            a = 1
-        elif x1[i][0]>x1[i][1]:
-            a = 0
-        p.learn(a,0.01)
-    print('Final Training')
-    e = 0
-    test = 100
-    x1 = [[np.random.randint(0,width),np.random.randint(0,height)] for i in range(test)]
-    for i in range(test):
-        p.set_input(x1[i])
-        y = p.get_output()
-        if x1[i][0]<x1[i][1]:
-            a = 1
-        elif x1[i][0]>x1[i][1]:
-            a = 0
-        if y != a:
-            e +=1 
-    print('final error : ',e/test)
-    
-    
-    
-if __name__ == '__main__':
-    run()
-            
-    
+
+
 #end
