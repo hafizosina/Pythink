@@ -1,34 +1,73 @@
 import numpy as np
 
+"""
+Pythink
+
+Program by Zhenzhu
+
+"""
+
+
+def sigmoid_func(x):
+    return 1/(1+np.power(np.e, -x))
+
+def sign_func(x):
+    if x >= 0:
+        return 1
+    elif x < 0:
+        return -1
+
 class Preceptron:
-    def __init__(self, x):
+    def __init__(self, x, learningRate = 0.1, func = sigmoid_func):
+        """
+        Initiate Preceptron by defining how many input (x) and make random weight
+        Preceptron(x, learning rate = 1)
+        """
+
+
         self.input = []
         self.weight = [np.random.random() for i in range(x+1)]
-        self.learnigRate = 1
+        self.learnigRate = learningRate
+        self.func = func
 	
     def set_input(self, x):
         if len(x) == len(self.weight)-1:
-            self.input = x
+            self.input = x.copy()
             self.input.append(1)
+
+    def get_output(self):
+        # learn NUMPY MATRIX !!!
+        self.output = sum(x*self.weight[i] for i,x in enumerate(self.input))
+        self.output = self.func(self.output)
+        return self.output
             
     def set_learnigRate(self, x):
         self.learnigRate = x
+
+    def guess(self, x):
+        self.set_input(x)
+        return self.get_output()
         
-    def get_output(self):
-        # learn NUMPY MATRIX BITCH !!!
-        self.output = sum(self.input[i]*self.weight[i] for i in range(len(self.input)))
-        self.output = sigmoid_func(self.output)
-        return self.output
+    def error_calc(self, y, o = None):
+        if o == None:
+            o = self.output
+        self.e = y - o
+        return self.e
         
-    def learn(self, y, t):
-        self.e = (y-self.output)
+    def learn(self, x, y, t = 0):
+        """
+        Preceptron.learn(input, output, toleransi)
+        """
+        self.guess(x)
+        self.error_calc(y)
         if abs(self.e) > t:
             dW = []
-            for i in range(len(self.input)):
-                dW.append(self.learnigRate*self.e*self.input[i])
-            self.weight = [self.weight[i]+dW[i] for i in range(len(self.weight))]
-        elif self.e < t:
-            pass
+            for i in self.input:
+                dW.append(self.learnigRate*self.e*i)
+            self.weight = [ w + dW[i] for i,w in enumerate(self.weight)]
+            return 1
+        else:
+            return 0
 
 class MultiPreceptron:
     def __init__(self,i, o):
@@ -92,8 +131,22 @@ class MultiPreceptron:
     def learn(self, y, t): #y gonna be the true answer and tis minimun tolerance 
         self.error = np.min(self.output,y)
         
-def sigmoid_func(x):
-    return 1/(1+np.power(np.e, -x))
+
 
 
 #end
+
+#test part
+if __name__ == "__main__":
+    print('================= start =================')
+    pc = Preceptron(2, func = sign_func)
+    from random import randint
+    for i in range(5):
+        jum = 0
+        for i in range(100):
+            x1 = [randint(1,10), randint(1,10)]
+            y1 = 1 if x1[0] <= x1[1] else -1 
+            jum += pc.learn(x1, y1)
+        avg = jum/100
+        print(jum, avg)
+    print(pc.weight)
